@@ -9,3 +9,16 @@ buildNumber.properties
 .mvn/timing.properties
 # https://github.com/takari/maven-wrapper#usage-without-binary-jar
 .mvn/wrapper/maven-wrapper.jar
+.idea
+.classpath
+.settings
+**/admin-service.iml
+**/auth-service.iml
+**/cart-service.iml
+**/customer-service.iml
+**/eureka-server.iml
+**/gateway-server.iml
+**/order-service.iml
+**/product-service.iml
+**/target
+backend.iml
