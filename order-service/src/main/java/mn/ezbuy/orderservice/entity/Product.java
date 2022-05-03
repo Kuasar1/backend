@@ -3,7 +3,7 @@ package mn.ezbuy.orderservice.entity;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mn.ezbuy.adminservice.util.ListToStringConverter;
+import mn.ezbuy.orderservice.util.ListToStringConverter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;

@@ -3,15 +3,14 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<modules>
-		<module>customer-service</module>
-		<module>auth-service</module>
 		<module>admin-service</module>
-		<module>cart-service</module>
+		<module>customer-service</module>
+		<module>stats-service</module>
 		<module>eureka-server</module>
 		<module>gateway-server</module>
 		<module>order-service</module>
         <module>payment-service</module>
-    </modules>
+	</modules>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>

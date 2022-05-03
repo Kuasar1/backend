@@ -1,8 +1,12 @@
 package mn.ezbuy.adminservice.controller;
 
 import lombok.RequiredArgsConstructor;
+import mn.ezbuy.adminservice.entity.Like;
 import mn.ezbuy.adminservice.entity.Product;
+import mn.ezbuy.adminservice.entity.Rating;
 import mn.ezbuy.adminservice.service.ProductService;
+import mn.ezbuy.adminservice.service.RecommendationService;
+import mn.ezbuy.adminservice.service.StatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -18,9 +22,20 @@ public class ProductControllerImplementation implements ProductController {
     @Autowired
     private final ProductService productService;
 
+    @Autowired
+    private final RecommendationService recommendationService;
+
+    @Autowired
+    private final StatsService statsService;
+
     @Override
     public ResponseEntity<?> getAll() {
         return productService.getAll();
+    }
+
+    @Override
+    public ResponseEntity<?> get(Long id, Long userId, String token) {
+        return productService.getForUser(id,userId,token);
     }
 
     @Override
@@ -54,8 +69,18 @@ public class ProductControllerImplementation implements ProductController {
     }
 
     @Override
-    public ResponseEntity<?> addRating(Object request, String token) {
+    public ResponseEntity<?> handleLike(Like request, String token) {
+        return productService.handleLike(request,token);
+    }
+
+    @Override
+    public ResponseEntity<?> addRating(Rating request, String token) {
         return productService.addRating(request,token);
+    }
+
+    @Override
+    public ResponseEntity<?> recommend() {
+        return statsService.generateRecommendation();
     }
 
 }

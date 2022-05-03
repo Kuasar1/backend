@@ -2,8 +2,14 @@ package mn.ezbuy.adminservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import mn.ezbuy.adminservice.entity.Like;
 import mn.ezbuy.adminservice.entity.Product;
+import mn.ezbuy.adminservice.entity.Ranking;
+import mn.ezbuy.adminservice.entity.Rating;
+import mn.ezbuy.adminservice.repository.LikeRepository;
 import mn.ezbuy.adminservice.repository.ProductRepository;
+import mn.ezbuy.adminservice.repository.RankingRepository;
+import mn.ezbuy.adminservice.repository.RatingRepository;
 import mn.ezbuy.adminservice.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,6 +29,12 @@ public class ProductService {
 
     @Autowired
     private final ProductRepository productRepository;
+    @Autowired
+    private final LikeRepository likeRepository;
+    @Autowired
+    private final RatingRepository ratingRepository;
+    @Autowired
+    private final RankingRepository rankingRepository;
     private static final Logger log = LoggerFactory.getLogger(ProductService.class);
     private final JwtUtil jwtUtil;
 
@@ -118,12 +130,51 @@ public class ProductService {
                 return new ResponseEntity<>("Product does not exist!", HttpStatus.BAD_REQUEST);
             } else {
                 Product product = productRepository.getById(id);
+//                List<Rating> rating = ratingRepository.getRatingsByProductId(product.getId());
+//                if(!rating.isEmpty()) {
+//                    long totalRating = 0L;
+//                    int numOfRating = 0;
+//                    for(Rating r : rating) {
+//                        numOfRating += 1;
+//                        totalRating += r.getRating();
+//                    }
+//                    product.setRating(Math.toIntExact(Math.round(Math.floor(totalRating/numOfRating))));
+//                } else {
+//                    product.setRating(0);
+//                }
+                product.setRating(0);
                 return new ResponseEntity<>(product,HttpStatus.OK);
             }
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
             log.info("End get");
+        }
+    }
+
+    @SneakyThrows
+    public ResponseEntity<?> getForUser(Long id, Long userId, String token) {
+        log.info("Start getForUser");
+        log.warn("getForUser REQ:{}",id);
+        try {
+            ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token,userId);
+            if(verificationResponse.getStatusCode() != HttpStatus.OK) {
+                return verificationResponse;
+            } else {
+                boolean exists = productRepository.findById(id).isPresent();
+                if(!exists) {
+                    return new ResponseEntity<>("Product does not exist!", HttpStatus.BAD_REQUEST);
+                } else {
+                    Product product = productRepository.getById(id);
+                    boolean hasRated = ratingRepository.getRatingForUser(userId,id).isPresent();
+                    product.setRating(hasRated ? ratingRepository.getRatingForUser(userId,id).get().getRating() : 0);
+                    return new ResponseEntity<>(product,HttpStatus.OK);
+                }
+            }
+        } catch (Exception e) {
+            throw new Exception(e);
+        } finally {
+            log.info("End getForUser");
         }
     }
 
@@ -167,21 +218,61 @@ public class ProductService {
     }
 
     @SneakyThrows
-    public ResponseEntity<?> addRating(Object request, String token) {
-        log.info("Start addRating");
-        log.warn("addRating REQ:{}",request);
+    public ResponseEntity<?> handleLike(Like request, String token) {
+        log.info("Start handleLike");
+        log.warn("handleLike REQ:{}",request);
         try {
-            ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAdmin(token);
+            ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token, request.getUserId());
             if(verificationResponse.getStatusCode() != HttpStatus.OK) {
                 return verificationResponse;
             } else {
-                System.out.println("Rating:" + request.toString());
+                boolean exists = likeRepository.getLikeForUser(request.getUserId(), request.getProductId()).isPresent();
+                if (exists) {
+                    Like like = likeRepository.getLikeForUser(request.getUserId(),request.getProductId()).get();
+                    likeRepository.delete(like);
+                } else {
+                    likeRepository.save(request);
+                }
                 return new ResponseEntity<>("Success",HttpStatus.OK);
             }
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End add");
+            log.info("End handleLike");
+        }
+    }
+
+    @SneakyThrows
+    public ResponseEntity<?> addRating(Rating request, String token) {
+        log.info("Start addRating");
+        log.warn("addRating REQ:{}",request);
+        try {
+            ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token, request.getUserId());
+            if(verificationResponse.getStatusCode() != HttpStatus.OK) {
+                return verificationResponse;
+            } else {
+                ratingRepository.save(request);
+                Ranking ranking;
+                boolean exists = rankingRepository.getRankingByProductId(request.getProductId()).isPresent();
+                if (exists) {
+                    ranking = rankingRepository.getRankingByProductId(request.getProductId()).get();
+                    ranking.setFrequency(ranking.getFrequency() + 1);
+                    ranking.setTotal(ranking.getTotal() + request.getRating());
+                    ranking.setAverage(ranking.getTotal()/ranking.getFrequency());
+                } else {
+                    ranking = new Ranking();
+                    ranking.setProductId(request.getProductId());
+                    ranking.setFrequency(1L);
+                    ranking.setTotal((long) request.getRating());
+                    ranking.setAverage(ranking.getTotal()/ranking.getFrequency());
+                }
+                rankingRepository.save(ranking);
+                return new ResponseEntity<>("Success",HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            throw new Exception(e);
+        } finally {
+            log.info("End addRating");
         }
     }
 
