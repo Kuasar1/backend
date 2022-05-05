@@ -1,11 +1,11 @@
-package mn.ezbuy.adminservice.service;
+package mn.ezbuy.productservice.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import mn.ezbuy.adminservice.entity.Product;
-import mn.ezbuy.adminservice.repository.ProductRepository;
-import mn.ezbuy.adminservice.repository.RatingRepository;
-import mn.ezbuy.adminservice.util.JwtUtil;
+import mn.ezbuy.productservice.entity.Product;
+import mn.ezbuy.productservice.repository.ProductRepository;
+import mn.ezbuy.productservice.repository.RatingRepository;
+import mn.ezbuy.productservice.util.JwtUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,9 +1,9 @@
-package mn.ezbuy.adminservice.entity;
+package mn.ezbuy.productservice.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import mn.ezbuy.adminservice.util.ListToStringConverter;
+import mn.ezbuy.productservice.util.ListToStringConverter;
 import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;

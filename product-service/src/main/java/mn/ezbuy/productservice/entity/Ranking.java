@@ -1,4 +1,4 @@
-package mn.ezbuy.adminservice.entity;
+package mn.ezbuy.productservice.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;

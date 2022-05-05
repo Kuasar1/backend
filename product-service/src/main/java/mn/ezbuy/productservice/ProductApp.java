@@ -1,4 +1,4 @@
-package mn.ezbuy.adminservice;
+package mn.ezbuy.productservice;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -6,10 +6,10 @@ import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 
 @SpringBootApplication
 @EnableEurekaClient
-public class AdminApp {
+public class ProductApp {
 
     public static void main(String[] args) {
-        SpringApplication.run(AdminApp.class, args);
+        SpringApplication.run(ProductApp.class, args);
     }
 
 }

@@ -1,8 +1,8 @@
-package mn.ezbuy.adminservice.controller;
+package mn.ezbuy.productservice.controller;
 
 import lombok.RequiredArgsConstructor;
-import mn.ezbuy.adminservice.entity.Product;
-import mn.ezbuy.adminservice.service.ProductService;
+import mn.ezbuy.productservice.entity.Product;
+import mn.ezbuy.productservice.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;

@@ -1,19 +1,17 @@
-package mn.ezbuy.adminservice.entity;
+package mn.ezbuy.productservice.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.CreationTimestamp;
 
 import javax.persistence.*;
-import java.util.Date;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "ratings")
-public class Rating {
+@Table(name = "likes")
+public class Like {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -23,9 +21,6 @@ public class Rating {
 
     private Long productId;
 
-    private int rating;
+    private int likeVal;
 
-    @Column(name = "timestamp", updatable = false)
-    @CreationTimestamp
-    private Date timestamp;
 }

@@ -1,6 +1,6 @@
-package mn.ezbuy.adminservice.controller;
+package mn.ezbuy.productservice.controller;
 
-import mn.ezbuy.adminservice.entity.Product;
+import mn.ezbuy.productservice.entity.Product;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

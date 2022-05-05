@@ -1,4 +1,4 @@
-package mn.ezbuy.adminservice.util;
+package mn.ezbuy.productservice.util;
 
 import javax.persistence.AttributeConverter;
 import java.util.Arrays;

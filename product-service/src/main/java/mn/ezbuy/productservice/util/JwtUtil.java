@@ -1,4 +1,4 @@
-package mn.ezbuy.adminservice.util;
+package mn.ezbuy.productservice.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
