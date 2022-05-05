@@ -1,31 +1,27 @@
-package mn.ezbuy.adminservice.service;
+package mn.ezbuy.recommendationservice.service;
 
 import com.mysql.cj.jdbc.MysqlDataSource;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import mn.ezbuy.adminservice.entity.Product;
-import mn.ezbuy.adminservice.entity.Ranking;
-import mn.ezbuy.adminservice.entity.Rating;
-import mn.ezbuy.adminservice.repository.LikeRepository;
-import mn.ezbuy.adminservice.repository.ProductRepository;
-import mn.ezbuy.adminservice.repository.RankingRepository;
-import mn.ezbuy.adminservice.repository.RatingRepository;
-import mn.ezbuy.adminservice.util.JwtUtil;
-import org.apache.mahout.cf.taste.impl.common.LongPrimitiveIterator;
+import mn.ezbuy.recommendationservice.entity.Like;
+import mn.ezbuy.recommendationservice.entity.Product;
+import mn.ezbuy.recommendationservice.entity.Ranking;
+import mn.ezbuy.recommendationservice.entity.Rating;
+import mn.ezbuy.recommendationservice.repository.LikeRepository;
+import mn.ezbuy.recommendationservice.repository.ProductRepository;
+import mn.ezbuy.recommendationservice.repository.RankingRepository;
+import mn.ezbuy.recommendationservice.repository.RatingRepository;
+import mn.ezbuy.recommendationservice.util.JwtUtil;
 import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel;
 import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
 import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
 import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.svd.SVDRecommender;
-import org.apache.mahout.cf.taste.impl.similarity.EuclideanDistanceSimilarity;
 import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
-import org.apache.mahout.cf.taste.recommender.ItemBasedRecommender;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
 import org.apache.mahout.cf.taste.recommender.UserBasedRecommender;
 import org.apache.mahout.cf.taste.similarity.ItemSimilarity;
-import org.apache.mahout.cf.taste.similarity.UserSimilarity;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,7 +30,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -44,11 +41,12 @@ public class RecommendationService {
     @Autowired
     private final ProductRepository productRepository;
     @Autowired
-    private final LikeRepository likeRepository;
-    @Autowired
     private final RatingRepository ratingRepository;
     @Autowired
     private final RankingRepository rankingRepository;
+    @Autowired
+    private final LikeRepository likeRepository;
+
     private static final Logger log = LoggerFactory.getLogger(RecommendationService.class);
     private final JwtUtil jwtUtil;
 
@@ -111,74 +109,31 @@ public class RecommendationService {
         log.info("Start justForYou");
         try {
             List<Product> recommendedProducts = new ArrayList<>();
-//            List<Rating> topRatings = ratingRepository.getTopRatingsForUser(userId);
-//            List<Long> topProducts = new ArrayList<>();
-//            topRatings.forEach(r -> {
-//                if (topProducts.size() < 5) {
-//                    topProducts.add(r.getProductId());
-//                }
-//            });
-//            log.warn("Top products for USER:{} | {}",userId,topProducts);
+            List<Rating> topRatings = ratingRepository.getTopRatingsForUser(userId);
+            List<Long> topProducts = new ArrayList<>();
+            topRatings.forEach(r -> {
+                if (topProducts.size() < 5) {
+                    topProducts.add(r.getProductId());
+                }
+            });
+            log.warn("Top products for USER:{} | {}",userId,topProducts);
             ItemSimilarity similarity = new PearsonCorrelationSimilarity(model);
             GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model,similarity);
-            for (LongPrimitiveIterator items = model.getItemIDs(); items.hasNext();) {
-                long itemId = items.nextLong();
-                List<RecommendedItem> recommendations = recommender.mostSimilarItems(itemId, 5);
+            for (Long productId : topProducts) {
+                List<RecommendedItem> recommendations = recommender.mostSimilarItems(productId, 5);
                 for (RecommendedItem recommendation : recommendations) {
-                    System.out.println(itemId + "," + recommendation.getItemID() + "," + recommendation.getValue());
+                    System.out.println(productId + "," + recommendation.getItemID() + "," + recommendation.getValue());
                     if(recommendation.getValue() > 0.24) {
                         recommendedProducts.add(productRepository.findById(recommendation.getItemID()).get());
                     }
                 }
 
             }
-//            for(Long i : topProducts) {
-//                List<RecommendedItem> recommendations = recommender.mostSimilarItems(i,5);
-//                recommendations.forEach(r -> {
-//                    log.warn("Recommendation: {}",r);
-//                    if(r.getValue() > 0.5) {
-//                        recommendedProducts.add(productRepository.findById(r.getItemID()).get());
-//                    }
-//                });
-//            }
-
-//            ItemBasedRecommender recommender = new GenericItemBasedRecommender(model,similarity);
-//            List<RecommendedItem> recommendedItems = recommender.recommend(userId,40);
-//            log.info("Recommendations for Customer:{} are:{}",userId,recommendedItems);
-//            List<Product> recommendedProducts = new ArrayList<>();
-//            for (RecommendedItem item : recommendedItems) {
-//                float estimatedPreference = recommender.estimatePreference(userId,item.getItemID());
-//                if(estimatedPreference > 3.4) {
-//                    Product product = productRepository.findById(item.getItemID()).get();
-//                    log.info("Product:{}",product);
-//                    recommendedProducts.add(product);
-//                }
-//            }
             if(recommendedProducts.isEmpty()) {
                 return mostPopular();
             } else {
                 return new ResponseEntity<>(recommendedProducts,HttpStatus.OK);
             }
-//            UserSimilarity similarity = new PearsonCorrelationSimilarity(model);
-//            UserNeighborhood neighborhood = new ThresholdUserNeighborhood(3.0,similarity,model);
-//            log.info("Neighbors of Customer:{} are: {}",userId,Arrays.toString(neighborhood.getUserNeighborhood(userId)));
-//            UserBasedRecommender recommender = new GenericUserBasedRecommender(model,neighborhood,similarity);
-//            List<RecommendedItem> recommendedItems = recommender.recommend(userId,40);
-//            log.info("Recommendations for Customer:{} are:{}",userId,recommendedItems);
-//            List<Product> recommendedProducts = new ArrayList<>();
-//            for (RecommendedItem item : recommendedItems) {
-//                float estimatedPreference = recommender.estimatePreference(userId,item.getItemID());
-//                if(estimatedPreference > 3.4) {
-//                    Product product = productRepository.findById(item.getItemID()).get();
-//                    log.info("Product:{}",product);
-//                    recommendedProducts.add(product);
-//                }
-//            }
-//            if(recommendedProducts.isEmpty()) {
-//                return mostPopular();
-//            } else {
-//                return new ResponseEntity<>(recommendedProducts,HttpStatus.OK);
-//            }
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
@@ -217,6 +172,66 @@ public class RecommendationService {
             throw new Exception(e);
         } finally {
             log.info("End youMayLike");
+        }
+    }
+
+
+    @SneakyThrows
+    public ResponseEntity<?> handleLike(Like request, String token) {
+        log.info("Start handleLike");
+        log.warn("handleLike REQ:{}",request);
+        try {
+            ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token, request.getUserId());
+            if(verificationResponse.getStatusCode() != HttpStatus.OK) {
+                return verificationResponse;
+            } else {
+                boolean exists = likeRepository.getLikeForUser(request.getUserId(), request.getProductId()).isPresent();
+                if (exists) {
+                    Like like = likeRepository.getLikeForUser(request.getUserId(),request.getProductId()).get();
+                    likeRepository.delete(like);
+                } else {
+                    likeRepository.save(request);
+                }
+                return new ResponseEntity<>("Success",HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            throw new Exception(e);
+        } finally {
+            log.info("End handleLike");
+        }
+    }
+
+    @SneakyThrows
+    public ResponseEntity<?> addRating(Rating request, String token) {
+        log.info("Start addRating");
+        log.warn("addRating REQ:{}",request);
+        try {
+            ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token, request.getUserId());
+            if(verificationResponse.getStatusCode() != HttpStatus.OK) {
+                return verificationResponse;
+            } else {
+                ratingRepository.save(request);
+                Ranking ranking;
+                boolean exists = rankingRepository.getRankingByProductId(request.getProductId()).isPresent();
+                if (exists) {
+                    ranking = rankingRepository.getRankingByProductId(request.getProductId()).get();
+                    ranking.setFrequency(ranking.getFrequency() + 1);
+                    ranking.setTotal(ranking.getTotal() + request.getRating());
+                    ranking.setAverage(ranking.getTotal()/ranking.getFrequency());
+                } else {
+                    ranking = new Ranking();
+                    ranking.setProductId(request.getProductId());
+                    ranking.setFrequency(1L);
+                    ranking.setTotal((long) request.getRating());
+                    ranking.setAverage(ranking.getTotal()/ranking.getFrequency());
+                }
+                rankingRepository.save(ranking);
+                return new ResponseEntity<>("Success",HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            throw new Exception(e);
+        } finally {
+            log.info("End addRating");
         }
     }
 

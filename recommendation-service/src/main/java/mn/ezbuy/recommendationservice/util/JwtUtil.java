@@ -1,4 +1,4 @@
-package mn.ezbuy.cartservice.util;
+package mn.ezbuy.recommendationservice.util;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;

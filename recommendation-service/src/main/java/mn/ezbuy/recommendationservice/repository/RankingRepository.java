@@ -1,6 +1,6 @@
-package mn.ezbuy.adminservice.repository;
+package mn.ezbuy.recommendationservice.repository;
 
-import mn.ezbuy.adminservice.entity.Ranking;
+import mn.ezbuy.recommendationservice.entity.Ranking;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;

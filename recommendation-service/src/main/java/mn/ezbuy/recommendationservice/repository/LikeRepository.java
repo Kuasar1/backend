@@ -1,7 +1,6 @@
-package mn.ezbuy.adminservice.repository;
+package mn.ezbuy.recommendationservice.repository;
 
-import mn.ezbuy.adminservice.entity.Like;
-import mn.ezbuy.adminservice.entity.Rating;
+import mn.ezbuy.recommendationservice.entity.Like;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;

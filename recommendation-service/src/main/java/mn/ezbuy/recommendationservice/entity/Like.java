@@ -1,4 +1,4 @@
-package mn.ezbuy.cartservice.entity;
+package mn.ezbuy.recommendationservice.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -10,17 +10,17 @@ import javax.persistence.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "items")
-public class Item {
+@Table(name = "likes")
+public class Like {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private Long id;
 
-    @Column(nullable = false)
+    private Long userId;
+
     private Long productId;
 
-    @Column(nullable = false)
-    private Integer quantity;
+    private int likeVal;
 
 }

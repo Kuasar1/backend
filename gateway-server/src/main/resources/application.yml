@@ -24,11 +24,6 @@ spring:
       discovery:
         locator:
           enabled: true
-#  datasource:
-#    url: jdbc:mysql://localhost:3306/main?useSSL=false
-#    username: root
-#    password: password
-#    driver-class-name: com.mysql.cj.jdbc.Driver
 
 jwt:
   secret: qrka66EDOYsxKyrIVOKhSh6CzC2kFFCJdHeIA9QwfzTdh6oPzakT1dM3FMr2NMs0GdOf9dHB1QloynSG

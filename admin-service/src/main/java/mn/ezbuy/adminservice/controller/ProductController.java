@@ -1,8 +1,6 @@
 package mn.ezbuy.adminservice.controller;
 
-import mn.ezbuy.adminservice.entity.Like;
 import mn.ezbuy.adminservice.entity.Product;
-import mn.ezbuy.adminservice.entity.Rating;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -32,14 +30,5 @@ public interface ProductController {
 
     @GetMapping("/getByName/{name}")
     ResponseEntity<?> getByName(@PathVariable(value = "name") String name);
-
-    @PostMapping("/like")
-    ResponseEntity<?> handleLike(@RequestBody Like request, @RequestHeader(value = "Authorization") String token);
-
-    @PostMapping("/rating")
-    ResponseEntity<?> addRating(@RequestBody Rating request, @RequestHeader(value = "Authorization") String token);
-
-    @PostMapping("/recommend")
-    ResponseEntity<?> recommend();
 
 }

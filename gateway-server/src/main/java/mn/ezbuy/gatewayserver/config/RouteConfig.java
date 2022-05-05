@@ -20,7 +20,7 @@ public class RouteConfig {
     public RouteLocator routes(RouteLocatorBuilder builder) {
 
         return builder.routes()
-                .route("admin-service", r -> r.path("/products/**","/admin/**","/recommendations/**")
+                .route("admin-service", r -> r.path("/products/**","/admin/**")
                         .filters(f -> f.filter(authenticationFilter))
                         .uri("lb://admin-service"))
 
@@ -39,6 +39,10 @@ public class RouteConfig {
                 .route("payment-service", r -> r.path("/payment/**")
                         .filters(f -> f.filter(authenticationFilter))
                         .uri("lb://payment-service"))
+
+                .route("recommendation-service", r -> r.path("/recommendations/**")
+                        .filters(f -> f.filter(authenticationFilter))
+                        .uri("lb://recommendation-service"))
 
                 .build();
     }

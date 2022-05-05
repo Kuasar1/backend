@@ -33,12 +33,12 @@ public class Order {
     @Column(nullable = false)
     private Double amount;
 
-    @ManyToMany(cascade = CascadeType.MERGE)
+    @ManyToOne(cascade = CascadeType.ALL)
     @LazyCollection(value = LazyCollectionOption.FALSE)
     @JoinTable(name = "orders_addresses",
             joinColumns = {@JoinColumn(name = "ORDER_ID", referencedColumnName = "ID")},
             inverseJoinColumns = {@JoinColumn(name = "ADDRESS_ID", referencedColumnName = "ID")})
-    private List<Address> addresses;
+    private Address addresses;
 
     @Column(nullable = false)
     private String status = "PENDING";

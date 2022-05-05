@@ -1,4 +1,4 @@
-package mn.ezbuy.adminservice.entity;
+package mn.ezbuy.recommendationservice.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,5 +32,6 @@ public class Ranking implements Comparable {
     @Override
     public int compareTo(Object o) {
         return 0;
+//        return (int) (this.average - new ObjectMapper().convertValue(o,Ranking.class).getAverage());
     }
 }
