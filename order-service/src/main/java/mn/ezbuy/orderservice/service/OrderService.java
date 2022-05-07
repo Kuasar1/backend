@@ -1,15 +1,10 @@
 package mn.ezbuy.orderservice.service;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import mn.ezbuy.orderservice.entity.Order;
-import mn.ezbuy.orderservice.entity.Product;
 import mn.ezbuy.orderservice.repository.OrderRepository;
 import mn.ezbuy.orderservice.util.JwtUtil;
-import org.aspectj.weaver.ast.Or;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,12 +25,11 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private static final Logger log = LoggerFactory.getLogger(OrderService.class);
     private final JwtUtil jwtUtil;
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     @SneakyThrows
     public ResponseEntity<?> add(Order request, String token) {
         log.info("Start add");
-        log.warn("add REQ:{}",request);
+        log.debug("add REQ:{}",request);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyToken(token);
             if(verificationResponse.getStatusCode() != HttpStatus.OK) {
@@ -48,21 +42,6 @@ public class OrderService {
             throw new Exception(e);
         } finally {
             log.info("End add");
-        }
-    }
-
-    @SneakyThrows
-    private void extractStats(Order request) {
-        log.info("Start extractStats");
-        log.warn("extractStats REQ:{}",request);
-        try {
-            for(Product product : request.getProducts()) {
-
-            }
-        } catch (Exception e) {
-            throw new Exception(e);
-        } finally {
-            log.info("End extractStats");
         }
     }
 
@@ -160,5 +139,4 @@ public class OrderService {
             log.info("End getAll");
         }
     }
-
 }

@@ -26,6 +26,7 @@ public class AuthenticationFilter implements GatewayFilter {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+
         ServerHttpRequest request = exchange.getRequest();
 
         if(routeValidator.isSecured.test(request)) {
@@ -56,7 +57,6 @@ public class AuthenticationFilter implements GatewayFilter {
     }
 
     private boolean isAuthMissing(ServerHttpRequest request) {
-        System.out.println("requestHeaders: " + request.getHeaders());
         return !request.getHeaders().containsKey("Authorization");
     }
 

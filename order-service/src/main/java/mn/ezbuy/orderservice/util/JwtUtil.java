@@ -20,9 +20,6 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
-    private String expirationTime;
-
     private Key key;
 
     @PostConstruct

@@ -53,7 +53,7 @@ public class RecommendationService {
     @SneakyThrows
     public ResponseEntity<?> recommend(String recommendationType, Long userId, String token) {
         log.info("Start recommend");
-        log.warn("recommend REQ:{} | {}",recommendationType,userId);
+        log.debug("recommend REQ:{} | {}",recommendationType,userId);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token,userId);
             if(verificationResponse.getStatusCode() != HttpStatus.OK) {
@@ -71,6 +71,7 @@ public class RecommendationService {
                         "product_id",
                         "rating",
                         "timestamp");
+
                 switch (recommendationType) {
                     case "JustForYou":
                         return justForYou(model,userId);
@@ -116,18 +117,15 @@ public class RecommendationService {
                     topProducts.add(r.getProductId());
                 }
             });
-            log.warn("Top products for USER:{} | {}",userId,topProducts);
             ItemSimilarity similarity = new PearsonCorrelationSimilarity(model);
             GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model,similarity);
             for (Long productId : topProducts) {
                 List<RecommendedItem> recommendations = recommender.mostSimilarItems(productId, 5);
                 for (RecommendedItem recommendation : recommendations) {
-                    System.out.println(productId + "," + recommendation.getItemID() + "," + recommendation.getValue());
                     if(recommendation.getValue() > 0.24) {
                         recommendedProducts.add(productRepository.findById(recommendation.getItemID()).get());
                     }
                 }
-
             }
             if(recommendedProducts.isEmpty()) {
                 return mostPopular();
@@ -147,19 +145,15 @@ public class RecommendationService {
         try {
             PearsonCorrelationSimilarity similarity = new PearsonCorrelationSimilarity(model);
             UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.5,similarity,model,1.0);
-            long[] neighbors = neighborhood.getUserNeighborhood(userId);
-            for (long n : neighbors) {
-                System.out.println("Neighbor: " + n);
-            }
             UserBasedRecommender userBasedRecommender = new GenericUserBasedRecommender(model,neighborhood,similarity);
             List<RecommendedItem> recommendedItems = userBasedRecommender.recommend(userId,40);
-            log.info("Recommendations for Customer:{} are:{}",userId,recommendedItems);
+            log.debug("Recommendations for Customer:{} are:{}",userId,recommendedItems);
             List<Product> recommendedProducts = new ArrayList<>();
             for (RecommendedItem item : recommendedItems) {
                 float estimatedPreference = userBasedRecommender.estimatePreference(userId,item.getItemID());
                 if(estimatedPreference > 3.4) {
                     Product product = productRepository.findById(item.getItemID()).get();
-                    log.info("Product:{}",product);
+                    log.debug("Product:{}",product);
                     recommendedProducts.add(product);
                 }
             }
@@ -179,7 +173,7 @@ public class RecommendationService {
     @SneakyThrows
     public ResponseEntity<?> handleLike(Like request, String token) {
         log.info("Start handleLike");
-        log.warn("handleLike REQ:{}",request);
+        log.debug("handleLike REQ:{}",request);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token, request.getUserId());
             if(verificationResponse.getStatusCode() != HttpStatus.OK) {
@@ -204,7 +198,7 @@ public class RecommendationService {
     @SneakyThrows
     public ResponseEntity<?> addRating(Rating request, String token) {
         log.info("Start addRating");
-        log.warn("addRating REQ:{}",request);
+        log.debug("addRating REQ:{}",request);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token, request.getUserId());
             if(verificationResponse.getStatusCode() != HttpStatus.OK) {
@@ -234,5 +228,4 @@ public class RecommendationService {
             log.info("End addRating");
         }
     }
-
 }

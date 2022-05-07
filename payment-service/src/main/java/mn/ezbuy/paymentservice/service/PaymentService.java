@@ -2,7 +2,6 @@ package mn.ezbuy.paymentservice.service;
 
 import com.stripe.Stripe;
 import com.stripe.model.Charge;
-import com.stripe.model.StripeObject;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import mn.ezbuy.paymentservice.entity.ChargeRequest;
@@ -33,7 +32,7 @@ public class PaymentService {
     @SneakyThrows
     public ResponseEntity<?> charge(ChargeRequest request) {
         log.info("Start charge");
-        log.info("charge REQ:{}",request);
+        log.debug("charge REQ:{}",request);
         try {
             Map<String, Object> params = new HashMap<>();
             params.put("amount",request.getAmount().longValue());

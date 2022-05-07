@@ -18,7 +18,6 @@ public class PaymentControllerImplementation implements PaymentController {
     @Autowired
     private final PaymentService paymentService;
 
-
     @Override
     public ResponseEntity<?> charge(ChargeRequest request) {
         return paymentService.charge(request);

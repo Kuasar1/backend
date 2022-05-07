@@ -15,7 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import javax.transaction.Transactional;
-import java.util.*;
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -134,7 +134,7 @@ public class ProductService {
     @SneakyThrows
     public ResponseEntity<?> getForUser(Long id, Long userId, String token) {
         log.info("Start getForUser");
-        log.warn("getForUser REQ:{}",id);
+        log.debug("getForUser REQ:{}",id);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token,userId);
             if(verificationResponse.getStatusCode() != HttpStatus.OK) {
@@ -173,6 +173,7 @@ public class ProductService {
     @SneakyThrows
     public ResponseEntity<?> getByCategory(String category) {
         log.info("Start getByCategory");
+        log.debug("getByCategory REQ:{}",category);
         try {
             List<Product> products = productRepository.findByCategory(category);
             return new ResponseEntity<>(products,HttpStatus.OK);
@@ -186,6 +187,7 @@ public class ProductService {
     @SneakyThrows
     public ResponseEntity<?> getByName(String name) {
         log.info("Start getByName");
+        log.debug("getByName REQ:{}",name);
         try {
             List<Product> products = productRepository.findByTitle(name);
             return new ResponseEntity<>(products,HttpStatus.OK);

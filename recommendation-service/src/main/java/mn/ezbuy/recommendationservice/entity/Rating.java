@@ -28,4 +28,5 @@ public class Rating {
     @Column(name = "timestamp", updatable = false)
     @CreationTimestamp
     private Date timestamp;
+
 }

@@ -13,8 +13,4 @@ public interface RatingRepository extends JpaRepository<Rating, Long> {
     @Query(value = "SELECT * FROM RATINGS WHERE PRODUCT_ID = :productId AND USER_ID = :userId", nativeQuery = true)
     Optional<Rating> getRatingForUser(@Param("userId") Long userId, @Param("productId") Long productId);
 
-    @Query(value = "SELECT * FROM RATINGS WHERE USER_ID = :userId ORDER BY RATING", nativeQuery = true)
-    List<Rating> getTopRatingsForUser(@Param("userId")  Long userId);
-
-    List<Rating> getRatingsByProductId(Long productId);
 }

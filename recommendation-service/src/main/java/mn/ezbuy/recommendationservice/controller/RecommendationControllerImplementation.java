@@ -24,7 +24,6 @@ public class RecommendationControllerImplementation implements RecommendationCon
         return recommendationService.recommend(recommendationType,userId,token);
     }
 
-
     @Override
     public ResponseEntity<?> handleLike(Like request, String token) {
         return recommendationService.handleLike(request,token);

@@ -32,6 +32,5 @@ public class Ranking implements Comparable {
     @Override
     public int compareTo(Object o) {
         return 0;
-//        return (int) (this.average - new ObjectMapper().convertValue(o,Ranking.class).getAverage());
     }
 }

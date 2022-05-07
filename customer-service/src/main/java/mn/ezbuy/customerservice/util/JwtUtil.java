@@ -61,15 +61,6 @@ public class JwtUtil {
         }
     }
 
-    public ResponseEntity<?> verifyToken(String token, Long id) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-        if(claims.getExpiration().before(new Date())) {
-            return new ResponseEntity<>("Token has expired!", HttpStatus.UNAUTHORIZED);
-        } else {
-            return new ResponseEntity<>(claims.toString(),HttpStatus.OK);
-        }
-    }
-
     public ResponseEntity<?> verifyTokenAndAuthorization(String token, Long id) {
         Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
         if(claims.getExpiration().before(new Date())) {

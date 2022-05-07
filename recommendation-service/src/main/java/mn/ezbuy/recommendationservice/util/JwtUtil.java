@@ -20,36 +20,11 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.expiration}")
-    private String expirationTime;
-
     private Key key;
 
     @PostConstruct
     public void init() {
         this.key = Keys.hmacShaKeyFor(secret.getBytes());
-    }
-
-    public ResponseEntity<?> verifyTokenAndAdmin(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-        if(claims.getExpiration().before(new Date())) {
-            return new ResponseEntity<>("Token has expired!", HttpStatus.UNAUTHORIZED);
-        } else {
-            if(claims.get("role",String.class).equals("ADMIN")) {
-                return new ResponseEntity<>(claims.toString(),HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>("Action is not allowed!",HttpStatus.FORBIDDEN);
-            }
-        }
-    }
-
-    public ResponseEntity<?> verifyToken(String token) {
-        Claims claims = Jwts.parserBuilder().setSigningKey(key).build().parseClaimsJws(token).getBody();
-        if(claims.getExpiration().before(new Date())) {
-            return new ResponseEntity<>("Token has expired!", HttpStatus.UNAUTHORIZED);
-        } else {
-            return new ResponseEntity<>(claims.toString(),HttpStatus.OK);
-        }
     }
 
     public ResponseEntity<?> verifyTokenAndAuthorization(String token, Long id) {
