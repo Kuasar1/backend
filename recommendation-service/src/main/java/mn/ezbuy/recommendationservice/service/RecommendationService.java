@@ -13,7 +13,6 @@ import mn.ezbuy.recommendationservice.repository.RankingRepository;
 import mn.ezbuy.recommendationservice.repository.RatingRepository;
 import mn.ezbuy.recommendationservice.util.JwtUtil;
 import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel;
-import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
