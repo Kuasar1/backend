@@ -13,10 +13,7 @@ import mn.ezbuy.recommendationservice.repository.RankingRepository;
 import mn.ezbuy.recommendationservice.repository.RatingRepository;
 import mn.ezbuy.recommendationservice.util.JwtUtil;
 import org.apache.mahout.cf.taste.impl.model.jdbc.MySQLJDBCDataModel;
-import org.apache.mahout.cf.taste.impl.neighborhood.ThresholdUserNeighborhood;
 import org.apache.mahout.cf.taste.impl.recommender.GenericItemBasedRecommender;
-import org.apache.mahout.cf.taste.impl.recommender.GenericUserBasedRecommender;
-import org.apache.mahout.cf.taste.impl.similarity.PearsonCorrelationSimilarity;
 import org.apache.mahout.cf.taste.model.DataModel;
 import org.apache.mahout.cf.taste.neighborhood.UserNeighborhood;
 import org.apache.mahout.cf.taste.recommender.RecommendedItem;
@@ -28,10 +25,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import javax.transaction.Transactional;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -112,24 +109,35 @@ public class RecommendationService {
             List<Product> recommendedProducts = new ArrayList<>();
             List<Rating> topRatings = ratingRepository.getTopRatingsForUser(userId);
             List<Long> topProducts = new ArrayList<>();
+            ItemSimilarity similarity = new PearsonCorrelationSimilarity(model);
+            GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model,similarity);
+
             topRatings.forEach(r -> {
-                if (topProducts.size() < 5) {
+                if (topProducts.size() < 10) {
                     topProducts.add(r.getProductId());
                 }
             });
-            ItemSimilarity similarity = new PearsonCorrelationSimilarity(model);
-            GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model,similarity);
+
+            long productCount =  productRepository.count();
+
             for (Long productId : topProducts) {
-                List<RecommendedItem> recommendations = recommender.mostSimilarItems(productId, 5);
+                List<RecommendedItem> recommendations = recommender.mostSimilarItems(productId, Math.toIntExact(productCount));
+                log.debug("Recommendations:{}",recommendations);
                 for (RecommendedItem recommendation : recommendations) {
-                    if(recommendation.getValue() > 0.24) {
-                        recommendedProducts.add(productRepository.findById(recommendation.getItemID()).get());
+                    if(recommendation.getValue() > 0.25) {
+                        long itemId = recommendation.getItemID();
+                        if(productRepository.findById(itemId).isPresent()) {
+                            recommendedProducts.add(productRepository.findById(itemId).get());
+                        }
                     }
                 }
             }
             if(recommendedProducts.isEmpty()) {
                 return mostPopular();
             } else {
+                Set<Product> set = new HashSet<>(recommendedProducts);
+                recommendedProducts.clear();
+                recommendedProducts.addAll(set);
                 return new ResponseEntity<>(recommendedProducts,HttpStatus.OK);
             }
         } catch (Exception e) {
@@ -144,22 +152,33 @@ public class RecommendationService {
         log.info("Start youMayLike");
         try {
             PearsonCorrelationSimilarity similarity = new PearsonCorrelationSimilarity(model);
-            UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.5,similarity,model,1.0);
+            UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.25, similarity, model, 1.0);
             UserBasedRecommender userBasedRecommender = new GenericUserBasedRecommender(model,neighborhood,similarity);
-            List<RecommendedItem> recommendedItems = userBasedRecommender.recommend(userId,40);
-            log.debug("Recommendations for Customer:{} are:{}",userId,recommendedItems);
+
+            long productCount = productRepository.count();
+
+            List<RecommendedItem> recommendedItems = userBasedRecommender.recommend(userId,Math.toIntExact(productCount));
+            log.info("Recommendations:{}",recommendedItems);
             List<Product> recommendedProducts = new ArrayList<>();
             for (RecommendedItem item : recommendedItems) {
                 float estimatedPreference = userBasedRecommender.estimatePreference(userId,item.getItemID());
-                if(estimatedPreference > 3.4) {
-                    Product product = productRepository.findById(item.getItemID()).get();
-                    log.debug("Product:{}",product);
-                    recommendedProducts.add(product);
+                if(estimatedPreference > 3) {
+                    Product product = productRepository.findById(item.getItemID()).isPresent()
+                            ? productRepository.findById(item.getItemID()).get()
+                            : new Product();
+                    if(ObjectUtils.isEmpty(product)) {
+                        continue;
+                    } else {
+                        recommendedProducts.add(product);
+                    }
                 }
             }
             if(recommendedProducts.isEmpty()) {
                 return mostPopular();
             } else {
+                Set<Product> set = new HashSet<>(recommendedProducts);
+                recommendedProducts.clear();
+                recommendedProducts.addAll(set);
                 return new ResponseEntity<>(recommendedProducts,HttpStatus.OK);
             }
         } catch (Exception e) {

@@ -38,7 +38,7 @@ public class Order {
     @JoinTable(name = "orders_addresses",
             joinColumns = {@JoinColumn(name = "ORDER_ID", referencedColumnName = "ID")},
             inverseJoinColumns = {@JoinColumn(name = "ADDRESS_ID", referencedColumnName = "ID")})
-    private Address addresses;
+    private Address address;
 
     @Column(nullable = false)
     private String status = "PENDING";

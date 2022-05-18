@@ -59,4 +59,6 @@ public class Product {
     @CreationTimestamp
     private Date updatedAt;
 
+    private int rating;
+
 }
