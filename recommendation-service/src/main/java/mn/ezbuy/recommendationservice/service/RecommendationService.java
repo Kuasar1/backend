@@ -48,7 +48,7 @@ public class RecommendationService {
 
     @SneakyThrows
     public ResponseEntity<?> recommend(String recommendationType, Long userId, String token) {
-        log.info("Start recommend");
+        log.debug("Start recommend");
         log.debug("recommend REQ:{} | {}",recommendationType,userId);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token,userId);
@@ -81,13 +81,13 @@ public class RecommendationService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End recommend");
+            log.debug("End recommend");
         }
     }
 
     @SneakyThrows
     private ResponseEntity<?> mostPopular() {
-        log.info("Start mostPopular");
+        log.debug("Start mostPopular");
         try {
             List<Ranking> rankings = rankingRepository.findAll();
             rankings.sort((o1, o2) -> (int) (o2.getAverage() - o1.getAverage()));
@@ -97,19 +97,20 @@ public class RecommendationService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End mostPopular");
+            log.debug("End mostPopular");
         }
     }
 
     @SneakyThrows
     private ResponseEntity<?> justForYou(DataModel model, Long userId) {
-        log.info("Start justForYou");
+        log.debug("Start justForYou");
         try {
             List<Product> recommendedProducts = new ArrayList<>();
             List<Rating> topRatings = ratingRepository.getTopRatingsForUser(userId);
             List<Long> topProducts = new ArrayList<>();
             ItemSimilarity similarity = new PearsonCorrelationSimilarity(model);
-            GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model,similarity);
+            GenericItemBasedRecommender recommender = new GenericItemBasedRecommender(model,
+                    similarity);
 
             topRatings.forEach(r -> {
                 if (topProducts.size() < 10) {
@@ -120,13 +121,16 @@ public class RecommendationService {
             long productCount =  productRepository.count();
 
             for (Long productId : topProducts) {
-                List<RecommendedItem> recommendations = recommender.mostSimilarItems(productId, Math.toIntExact(productCount));
+                List<RecommendedItem> recommendations = recommender.mostSimilarItems(productId,
+                        Math.toIntExact(productCount));
                 log.debug("Recommendations:{}",recommendations);
                 for (RecommendedItem recommendation : recommendations) {
+                    log.debug("JFU:{}",recommendation);
                     if(recommendation.getValue() > 0.25) {
                         long itemId = recommendation.getItemID();
                         if(productRepository.findById(itemId).isPresent()) {
                             recommendedProducts.add(productRepository.findById(itemId).get());
+                            log.debug("Added:{}",itemId);
                         }
                     }
                 }
@@ -142,25 +146,30 @@ public class RecommendationService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End justForYou");
+            log.debug("End justForYou");
         }
     }
 
     @SneakyThrows
     private ResponseEntity<?> youMayLike(DataModel model, Long userId) {
-        log.info("Start youMayLike");
+        log.debug("Start youMayLike");
         try {
             PearsonCorrelationSimilarity similarity = new PearsonCorrelationSimilarity(model);
-            UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.25, similarity, model, 1.0);
-            UserBasedRecommender userBasedRecommender = new GenericUserBasedRecommender(model,neighborhood,similarity);
+            UserNeighborhood neighborhood = new ThresholdUserNeighborhood(0.25,
+                    similarity, model);
+            UserBasedRecommender userBasedRecommender = new GenericUserBasedRecommender(model,
+                    neighborhood,similarity);
 
             long productCount = productRepository.count();
 
-            List<RecommendedItem> recommendedItems = userBasedRecommender.recommend(userId,Math.toIntExact(productCount));
-            log.info("Recommendations:{}",recommendedItems);
+            List<RecommendedItem> recommendedItems = userBasedRecommender.recommend(userId,
+                    Math.toIntExact(productCount));
+            log.debug("Recommendations:{}",recommendedItems);
             List<Product> recommendedProducts = new ArrayList<>();
             for (RecommendedItem item : recommendedItems) {
-                float estimatedPreference = userBasedRecommender.estimatePreference(userId,item.getItemID());
+                log.debug("YML:{}",item);
+                float estimatedPreference = userBasedRecommender.estimatePreference(userId,
+                        item.getItemID());
                 if(estimatedPreference > 3) {
                     Product product = productRepository.findById(item.getItemID()).isPresent()
                             ? productRepository.findById(item.getItemID()).get()
@@ -183,14 +192,14 @@ public class RecommendationService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End youMayLike");
+            log.debug("End youMayLike");
         }
     }
 
 
     @SneakyThrows
     public ResponseEntity<?> handleLike(Like request, String token) {
-        log.info("Start handleLike");
+        log.debug("Start handleLike");
         log.debug("handleLike REQ:{}",request);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token, request.getUserId());
@@ -209,13 +218,13 @@ public class RecommendationService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End handleLike");
+            log.debug("End handleLike");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> addRating(Rating request, String token) {
-        log.info("Start addRating");
+        log.debug("Start addRating");
         log.debug("addRating REQ:{}",request);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token, request.getUserId());
@@ -243,7 +252,7 @@ public class RecommendationService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End addRating");
+            log.debug("End addRating");
         }
     }
 }

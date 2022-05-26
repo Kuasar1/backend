@@ -31,7 +31,7 @@ public class PaymentService {
 
     @SneakyThrows
     public ResponseEntity<?> charge(ChargeRequest request) {
-        log.info("Start charge");
+        log.debug("Start charge");
         log.debug("charge REQ:{}",request);
         try {
             Map<String, Object> params = new HashMap<>();
@@ -44,7 +44,7 @@ public class PaymentService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End charge");
+            log.debug("End charge");
         }
     }
 

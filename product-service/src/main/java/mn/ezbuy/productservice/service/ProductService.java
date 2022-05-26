@@ -31,7 +31,7 @@ public class ProductService {
 
     @SneakyThrows
     public ResponseEntity<?> add(Product request, String token) {
-        log.info("Start add");
+        log.debug("Start add");
         log.debug("add REQ:{}",request);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAdmin(token);
@@ -50,13 +50,13 @@ public class ProductService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End add");
+            log.debug("End add");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> update(Product request, String token, Long id) {
-        log.info("Start update");
+        log.debug("Start update");
         log.debug("update REQ:{}",request);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAdmin(token);
@@ -83,13 +83,13 @@ public class ProductService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End update");
+            log.debug("End update");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> delete(String token, Long id) {
-        log.info("Start delete");
+        log.debug("Start delete");
         log.debug("delete REQ:{}",id);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAdmin(token);
@@ -107,13 +107,13 @@ public class ProductService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End delete");
+            log.debug("End delete");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> get(Long id) {
-        log.info("Start get");
+        log.debug("Start get");
         log.debug("get REQ:{}",id);
         try {
             boolean exists = productRepository.findById(id).isPresent();
@@ -127,13 +127,13 @@ public class ProductService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End get");
+            log.debug("End get");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> getForUser(Long id, Long userId, String token) {
-        log.info("Start getForUser");
+        log.debug("Start getForUser");
         log.debug("getForUser REQ:{}",id);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token,userId);
@@ -153,26 +153,26 @@ public class ProductService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End getForUser");
+            log.debug("End getForUser");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> getAll() {
-        log.info("Start getAll");
+        log.debug("Start getAll");
         try {
             List<Product> products = productRepository.findAll();
             return new ResponseEntity<>(products,HttpStatus.OK);
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End getAll");
+            log.debug("End getAll");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> getByCategory(String category) {
-        log.info("Start getByCategory");
+        log.debug("Start getByCategory");
         log.debug("getByCategory REQ:{}",category);
         try {
             List<Product> products = productRepository.findByCategory(category);
@@ -180,13 +180,13 @@ public class ProductService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End getByCategory");
+            log.debug("End getByCategory");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> getByName(String name) {
-        log.info("Start getByName");
+        log.debug("Start getByName");
         log.debug("getByName REQ:{}",name);
         try {
             List<Product> products = productRepository.findByTitle(name);
@@ -194,7 +194,7 @@ public class ProductService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End getByName");
+            log.debug("End getByName");
         }
     }
 

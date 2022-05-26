@@ -16,7 +16,7 @@ import com.google.common.base.Preconditions;
 
 abstract class AbstractSimilarity extends AbstractItemSimilarity implements UserSimilarity {
 
-    private PreferenceInferrer inferrer;
+    private PreferenceInferrer inferior;
     private final boolean weighted;
     private final boolean centerData;
     private int cachedNumItems;
@@ -36,16 +36,16 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
         });
     }
 
-    final PreferenceInferrer getPreferenceInferrer() {
-        return inferrer;
+    final PreferenceInferrer getPreferenceInferior() {
+        return inferior;
     }
 
     @Override
-    public final void setPreferenceInferrer(PreferenceInferrer inferrer) {
-        Preconditions.checkArgument(inferrer != null, "inferrer is null");
-        refreshHelper.addDependency(inferrer);
-        refreshHelper.removeDependency(this.inferrer);
-        this.inferrer = inferrer;
+    public final void setPreferenceInferrer(PreferenceInferrer inferior) {
+        Preconditions.checkArgument(inferior != null, "inferior is null");
+        refreshHelper.addDependency(inferior);
+        refreshHelper.removeDependency(this.inferior);
+        this.inferior = inferior;
     }
 
     final boolean isWeighted() {
@@ -79,7 +79,7 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
         double sumXYdiff2 = 0.0;
         int count = 0;
 
-        boolean hasInferrer = inferrer != null;
+        boolean hasInferrer = inferior != null;
 
         while (true) {
             int compare = Long.compare(xIndex, yIndex);
@@ -92,10 +92,10 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
                 } else {
                     if (compare < 0) {
                         x = xPrefs.getValue(xPrefIndex);
-                        y = inferrer.inferPreference(userID2, xIndex);
+                        y = inferior.inferPreference(userID2, xIndex);
                     } else {
-                        assert inferrer != null;
-                        x = inferrer.inferPreference(userID1, yIndex);
+                        assert inferior != null;
+                        x = inferior.inferPreference(userID1, yIndex);
                         y = yPrefs.getValue(yPrefIndex);
                     }
                 }
@@ -264,7 +264,7 @@ abstract class AbstractSimilarity extends AbstractItemSimilarity implements User
 
     @Override
     public final String toString() {
-        return this.getClass().getSimpleName() + "[dataModel:" + getDataModel() + ",inferrer:" + inferrer + ']';
+        return this.getClass().getSimpleName() + "[dataModel:" + getDataModel() + ",inferrer:" + inferior + ']';
     }
 
 }

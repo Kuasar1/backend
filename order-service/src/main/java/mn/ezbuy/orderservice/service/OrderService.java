@@ -28,7 +28,7 @@ public class OrderService {
 
     @SneakyThrows
     public ResponseEntity<?> add(Order request, String token) {
-        log.info("Start add");
+        log.debug("Start add");
         log.debug("add REQ:{}",request);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyToken(token);
@@ -41,13 +41,13 @@ public class OrderService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End add");
+            log.debug("End add");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> update(Order request, String token, Long id) {
-        log.info("Start update");
+        log.debug("Start update");
         log.debug("update REQ:{}",request);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAdmin(token);
@@ -70,13 +70,13 @@ public class OrderService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End update");
+            log.debug("End update");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> delete(String token, Long id) {
-        log.info("Start delete");
+        log.debug("Start delete");
         log.debug("delete REQ:{}",id);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAdmin(token);
@@ -94,13 +94,13 @@ public class OrderService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End delete");
+            log.debug("End delete");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> getUserOrder(String token, Long id) {
-        log.info("Start getUserOrder");
+        log.debug("Start getUserOrder");
         log.debug("getUserOrder REQ:{}",id);
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAuthorization(token,id);
@@ -118,13 +118,13 @@ public class OrderService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End getUserOrder");
+            log.debug("End getUserOrder");
         }
     }
 
     @SneakyThrows
     public ResponseEntity<?> getAll(String token) {
-        log.info("Start getAll");
+        log.debug("Start getAll");
         try {
             ResponseEntity<?> verificationResponse = jwtUtil.verifyTokenAndAdmin(token);
             if(verificationResponse.getStatusCode() != HttpStatus.OK) {
@@ -136,7 +136,7 @@ public class OrderService {
         } catch (Exception e) {
             throw new Exception(e);
         } finally {
-            log.info("End getAll");
+            log.debug("End getAll");
         }
     }
 }

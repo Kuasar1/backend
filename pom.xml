@@ -16,7 +16,7 @@
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
 		<version>2.6.5</version>
-		<relativePath/> <!-- lookup parent from repository -->
+		<relativePath/>
 	</parent>
 
 	<groupId>mn.ezbuy</groupId>
@@ -24,7 +24,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>backend</name>
-	<description>Backend portion for EZbuy ecommerce system</description>
+	<description>Backend portion for AmarBuy ecommerce system</description>
 
 	<properties>
 		<java.version>11</java.version>
